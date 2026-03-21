@@ -1,0 +1,30 @@
+# Video files
+*.mp4
+*.avi
+
+# Model files
+*.task
+
+# Data files
+*.npy
+
+# Images
+*.png
+
+# Output folders
+skeleton_output/
+
+# Dataset
+dataset/
+
+# Models
+models/
+
+# Virtual env & backups
+.venv-backups/
+venv-main-*.txt
+backup.log
+
+# Python cache
+__pycache__/
+*.pyc
