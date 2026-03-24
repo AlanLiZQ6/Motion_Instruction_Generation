@@ -1,0 +1,560 @@
+[
+    {
+        "beginner_video_name": "p10_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p10_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p10_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p11_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p11_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p11_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p12_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p12_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p12_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p13_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p13_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p13_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p14_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p14_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p14_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p15_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p15_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p15_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p16_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p16_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p16_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p17_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p17_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p17_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p18_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p18_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p18_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p19_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p19_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p19_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p1_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p1_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p1_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p20_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p20_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p20_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p21_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p21_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p21_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p22_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p22_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p22_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p23_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p23_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p23_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p24_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p24_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p24_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p25_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p25_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p25_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p26_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p26_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p26_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p27_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p27_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p27_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p28_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p28_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p28_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p29_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p29_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p29_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p2_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p2_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p2_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p30_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p30_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p30_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p31_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p31_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p31_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p3_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p3_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p3_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p4_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p4_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p4_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p5_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p5_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p5_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p6_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p6_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p6_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p7_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p7_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p7_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p8_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p8_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p8_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p9_foreflat_s1_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p9_foreflat_s2_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    },
+    {
+        "beginner_video_name": "p9_foreflat_s3_world.npy",
+        "expert_video_name": "p32_foreflat_s1_world.npy",
+        "motion_type": "foreflat",
+        "labels": []
+    }
+]

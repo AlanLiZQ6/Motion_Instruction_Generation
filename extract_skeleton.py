@@ -146,6 +146,9 @@ def process_video(
     num_poses: int = 1,
     min_detection_confidence: float = 0.5,
     min_tracking_confidence: float = 0.5,
+    save_npy: bool = True,
+    save_world: bool = True,
+    save_video: bool = True,
 ) -> dict:
     """
     Extract skeleton data AND render annotated video in a single pass.
@@ -179,9 +182,11 @@ def process_video(
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Setup output video writer
-    os.makedirs(os.path.dirname(output_video_path) or '.', exist_ok=True)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out_video = cv2.VideoWriter(output_video_path, fourcc, fps, (w, h))
+    out_video = None
+    if save_video:
+        os.makedirs(os.path.dirname(output_video_path) or '.', exist_ok=True)
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out_video = cv2.VideoWriter(output_video_path, fourcc, fps, (w, h))
 
     all_landmarks = []
     all_world_landmarks = []
@@ -217,37 +222,42 @@ def process_video(
             ])
 
             # Draw skeleton on frame
-            draw_skeleton_on_frame(frame, pose, w, h)
-
-            # Add frame info text
-            cv2.putText(
-                frame, f'Frame {frame_idx} | Pose detected',
-                (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA
-            )
+            if save_video:
+                draw_skeleton_on_frame(frame, pose, w, h)
+                cv2.putText(
+                    frame, f'Frame {frame_idx} | Pose detected',
+                    (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1, cv2.LINE_AA
+                )
         else:
             frame_lm = np.zeros((33, 5))
             frame_wlm = np.zeros((33, 3))
-            cv2.putText(
-                frame, f'Frame {frame_idx} | No pose',
-                (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1, cv2.LINE_AA
-            )
+            if save_video:
+                cv2.putText(
+                    frame, f'Frame {frame_idx} | No pose',
+                    (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1, cv2.LINE_AA
+                )
 
         all_landmarks.append(frame_lm)
         all_world_landmarks.append(frame_wlm)
-        out_video.write(frame)
+        if save_video:
+            out_video.write(frame)
         frame_idx += 1
 
     cap.release()
-    out_video.release()
+    if out_video is not None:
+        out_video.release()
     landmarker.close()
 
     # Save .npy files
     landmarks_arr = np.array(all_landmarks)        # (T, 33, 5)
     world_arr = np.array(all_world_landmarks)      # (T, 33, 3)
 
-    os.makedirs(os.path.dirname(output_npy_path) or '.', exist_ok=True)
-    np.save(output_npy_path, landmarks_arr)
-    np.save(output_world_npy_path, world_arr)
+    if save_npy or save_world:
+        os.makedirs(os.path.dirname(output_npy_path) or '.', exist_ok=True)
+    if save_npy:
+        np.save(output_npy_path, landmarks_arr)
+    if save_world:
+        np.save(output_world_npy_path, world_arr)
 
     return {
         'landmarks_shape': landmarks_arr.shape,
@@ -261,7 +271,8 @@ def process_video(
 # ──────────────────────────────────────────────
 # Single video mode
 # ──────────────────────────────────────────────
-def run_single(video_path: str, model_path: str, output_dir: str):
+def run_single(video_path: str, model_path: str, output_dir: str,
+               save_npy: bool = True, save_world: bool = True, save_video: bool = True):
     stem = Path(video_path).stem
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -277,20 +288,25 @@ def run_single(video_path: str, model_path: str, output_dir: str):
     result = process_video(
         video_path, model_path,
         npy_path, world_path, video_out,
+        save_npy=save_npy, save_world=save_world, save_video=save_video,
     )
 
     det_rate = result['frames_with_pose'] / max(result['total_frames'], 1)
     print(f"\nDone!")
-    print(f"  Landmarks:  {npy_path}  {result['landmarks_shape']}")
-    print(f"  World:      {world_path}  {result['world_shape']}")
-    print(f"  Video:      {video_out}")
+    if save_npy:
+        print(f"  Landmarks:  {npy_path}  {result['landmarks_shape']}")
+    if save_world:
+        print(f"  World:      {world_path}  {result['world_shape']}")
+    if save_video:
+        print(f"  Video:      {video_out}")
     print(f"  Frames:     {result['total_frames']} | Detection: {det_rate:.1%} | FPS: {result['fps']:.1f}")
 
 
 # ──────────────────────────────────────────────
 # Batch mode
 # ──────────────────────────────────────────────
-def run_batch(input_dir: str, model_path: str, output_dir: str):
+def run_batch(input_dir: str, model_path: str, output_dir: str,
+              save_npy: bool = True, save_world: bool = True, save_video: bool = True):
     input_path = Path(input_dir)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -326,7 +342,8 @@ def run_batch(input_dir: str, model_path: str, output_dir: str):
             continue
 
         try:
-            result = process_video(str(vf), model_path, npy_path, world_path, video_out)
+            result = process_video(str(vf), model_path, npy_path, world_path, video_out,
+                                   save_npy=save_npy, save_world=save_world, save_video=save_video)
             det = result['frames_with_pose'] / max(result['total_frames'], 1)
             print(
                 f"[{i+1}/{len(video_files)}] OK: {rel} "
@@ -369,6 +386,12 @@ if __name__ == '__main__':
                         help='heavy / full / lite, or path to .task file')
     parser.add_argument('--single', type=str, default=None,
                         help='Single video file path')
+    parser.add_argument('--no-npy', action='store_true',
+                        help='Skip saving normalized landmarks .npy')
+    parser.add_argument('--no-world', action='store_true',
+                        help='Skip saving world landmarks .npy')
+    parser.add_argument('--no-video', action='store_true',
+                        help='Skip saving skeleton overlay .mp4')
 
     args = parser.parse_args()
 
@@ -378,9 +401,15 @@ if __name__ == '__main__':
     else:
         model_path = get_model_path(args.model)
 
+    save_npy = not args.no_npy
+    save_world = not args.no_world
+    save_video = not args.no_video
+
     if args.single:
-        run_single(args.single, model_path, args.output_dir)
+        run_single(args.single, model_path, args.output_dir,
+                   save_npy=save_npy, save_world=save_world, save_video=save_video)
     else:
         if not args.input_dir:
             parser.error("--input_dir is required for batch mode")
-        run_batch(args.input_dir, model_path, args.output_dir)
+        run_batch(args.input_dir, model_path, args.output_dir,
+                  save_npy=save_npy, save_world=save_world, save_video=save_video)
