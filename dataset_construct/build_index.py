@@ -10,6 +10,7 @@ def parse_filename(filename):
     parts = name.split("_")
     subject = parts[0]        
     action_code = parts[1]  
+
     # subject id
     subject_id = int(subject[1:])
     level = "beginner" if subject_id <= 31 else "expert"
@@ -42,3 +43,5 @@ def generate_index_csv(npy_beginner_dir, npy_expert_dir, output_name, avi_beginn
         writer.writerows(rows)
     print(f"Saved {len(rows)} samples to {output_name}")
     
+        
+
