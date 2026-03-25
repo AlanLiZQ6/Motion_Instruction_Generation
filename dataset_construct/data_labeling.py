@@ -45,7 +45,7 @@ for index, row in file_index.iterrows():
     )
 
     # Append generated text to the corresponding labels list
-    beginner_id = row["id"]  # e.g. "p23_foreflat_s1_world.npy"
+    beginner_id = row["id"]
     if beginner_id in dataset_lookup:
         dataset_lookup[beginner_id]["labels"].append(response.text)
         print(f"Added label for {beginner_id}")
