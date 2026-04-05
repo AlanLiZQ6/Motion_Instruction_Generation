@@ -86,6 +86,9 @@ def preprocess_video(input_path, output_path, model, target_size=224, padding=0.
     return True
 
 def main():
+    
+    # initiallize the model
+    model = YOLO("yolov9c.pt")
 
     # Access the global parameters
     params_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "global_params.json"))
@@ -106,8 +109,14 @@ def main():
         target_dir = os.path.join(preprocessed_data_path, rel_path)
         os.makedirs(target_dir, exist_ok=True)
         
+        for filename in filenames:
+            source_file = os.path.join(dirpath, filename)
+            target_file = os.path.join(target_dir, filename)
+            process_result = preprocess_video(source_file, target_file, model, target_size=224, padding=0.2)
+            if process_result == False:
+                raise RuntimeError(f"Failed to preprocess video: {source_file}")
     
-
+        print(f"The videos in the {dirpath} dir have been processed.")
 
 if __name__ == "__main__":
     main()
