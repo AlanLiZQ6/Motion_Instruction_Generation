@@ -43,6 +43,8 @@ def main():
 
     for data_dirs in os.listdir(dataset_path):
         data_type = os.path.join(dataset_path, data_dirs)
+        if not os.path.isdir(data_type):
+            continue
         for action_dirs in os.listdir(data_type):
             separate_expert_beginner(os.path.join(data_type, action_dirs))
 
