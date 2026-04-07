@@ -64,7 +64,7 @@ def build_samples(source_dir):
 
 def main():
     params_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "global_params.json")
+        os.path.join(os.path.dirname(__file__), "..", "..", "global_params.json")
     )
     with open(params_path) as f:
         params = json.load(f)

@@ -18,7 +18,7 @@ import pickle
 from scipy.spatial.distance import cdist
 
 # Add VideoAlignment to path for model imports
-VIDEO_ALIGN_DIR = "/workspace/MotionExpert/VideoAlignment"
+VIDEO_ALIGN_DIR = "/workspace/MotionExpert_forked/VideoAlignment"
 sys.path.insert(0, VIDEO_ALIGN_DIR)
 
 
@@ -116,7 +116,7 @@ def main():
         "result/tennis_alignment/checkpoints/checkpoint_epoch_00099.pth"
     )
     params_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "global_params.json")
+        os.path.join(os.path.dirname(__file__), "..", "..", "global_params.json")
     )
     with open(params_path) as f:
         params = json.load(f)
@@ -127,7 +127,7 @@ def main():
     expert_dir = os.path.join(video_dir, "experts")
 
     dataset_json_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "dataset", "dataset.json")
+        os.path.join(os.path.dirname(__file__), "..", "..", "dataset_build", "dataset.json")
     )
 
     # --- Load model ---

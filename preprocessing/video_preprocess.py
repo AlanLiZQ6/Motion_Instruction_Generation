@@ -103,7 +103,7 @@ def main():
     preprocessed_data_path = os.path.join(dataset_path, "preprocessed_data")
 
     # Mirror the raw_data directory structure into preprocessed_data
-    for dirpath, dirnames, filenames in os.walk(raw_data_path):
+    for dirpath, dirnames, filenames in os.walk(raw_data_path, followlinks=True):
         # Compute the relative path from raw_data and recreate it under preprocessed_data
         rel_path = os.path.relpath(dirpath, raw_data_path)
         target_dir = os.path.join(preprocessed_data_path, rel_path)
