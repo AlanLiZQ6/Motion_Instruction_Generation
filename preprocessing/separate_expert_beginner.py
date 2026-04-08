@@ -26,7 +26,7 @@ def separate_expert_beginner(path):
         else:
             shutil.move(src, os.path.join(beginner_dir, file))
 
-    print(f'Directory has been classified.')
+    print(f'{path} has been classified.')
     
 
 
@@ -46,7 +46,10 @@ def main():
         if not os.path.isdir(data_type):
             continue
         for action_dirs in os.listdir(data_type):
-            separate_expert_beginner(os.path.join(data_type, action_dirs))
+            action_path = os.path.join(data_type, action_dirs)
+            if not os.path.isdir(action_path):
+                continue
+            separate_expert_beginner(action_path)
 
 
     print('All the files has been classified !')

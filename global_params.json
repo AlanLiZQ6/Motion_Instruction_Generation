@@ -1,3 +1,4 @@
 {
-    "dataset_path": "/workspace/dataset"
+    "dataset_path": "/workspace/dataset",
+    "MediaPipe_model_path": "/workspace/pose_landmarker_full.task"
 }

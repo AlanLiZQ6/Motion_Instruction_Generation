@@ -37,23 +37,25 @@ if __name__ == "__main__":
         
     dataset_path = params["dataset_path"]
     skeleton_dir_path = os.path.join(dataset_path, "skeleton_output")
-    raw_dir_path = os.path.join(dataset_path, "raw_data")
+    video_dir_path = os.path.join(dataset_path, "VIDEO_RGB")
 
     for action_dirs in os.listdir(skeleton_dir_path):
         action_directory = os.path.join(skeleton_dir_path, action_dirs)
-        raw_action = action_dirs.rsplit("_", 1)[0]
-        raw_action_directory = os.path.join(raw_dir_path, raw_action)
+        video_action = action_dirs.rsplit("_", 1)[0]
+        video_action_directory = os.path.join(video_dir_path, video_action)
         print(action_directory)
-        print(raw_action_directory)
+        print(video_action_directory)
         sub_directory = action_directory.split("/")
         action_name = sub_directory[-1]
-        csv_name = f"{action_name}_list.csv"
+        csv_dir = os.path.join(os.path.dirname(__file__), 'label_csv')
+        os.makedirs(csv_dir, exist_ok=True)
+        csv_name = os.path.join(csv_dir, f"{action_name}_list.csv")
         for filename in os.listdir(action_directory):
             if filename == 'beginner':
                 beginner_dir = os.path.join(action_directory, 'beginner')
                 experts_dir = os.path.join(action_directory, 'experts')
-                avi_beginner_dir = os.path.join(raw_action_directory, 'beginner')
-                avi_expert_dir = os.path.join(raw_action_directory, 'experts')
+                avi_beginner_dir = os.path.join(video_action_directory, 'beginner')
+                avi_expert_dir = os.path.join(video_action_directory, 'experts')
                 generate_index_csv(beginner_dir,experts_dir,csv_name, avi_beginner_dir, avi_expert_dir)
                 index_table = pd.read_csv(csv_name, index_col="id")
                 for filename in os.listdir(beginner_dir):

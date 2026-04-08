@@ -86,36 +86,39 @@ def preprocess_video(input_path, output_path, model, target_size=224, padding=0.
     return True
 
 def main():
-    
+
     # initiallize the model
     model = YOLO("yolov9c.pt")
 
-    # Access the global parameters
-    params_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "global_params.json"))
+    input_path = "/workspace/dataset/VIDEO_RGB"
+    output_path = "/workspace/dataset/preprocessed_data"
 
-    with open(params_path) as f:
-        params = json.load(f)
+    # Mirror the VIDEO_RGB directory structure into preprocessed_data,
+    # skipping any directories/files that already exist in the output.
+    for dirpath, dirnames, filenames in os.walk(input_path, followlinks=True):
+        rel_path = os.path.relpath(dirpath, input_path)
+        target_dir = os.path.join(output_path, rel_path)
 
-    # Access the dataset directory
-    dataset_path = params["dataset_path"]
+        # Skip subdirectories that already exist in preprocessed_data
+        dirnames[:] = [d for d in dirnames
+                       if not os.path.isdir(os.path.join(target_dir, d))]
 
-    raw_data_path = os.path.join(dataset_path, "raw_data")
-    preprocessed_data_path = os.path.join(dataset_path, "preprocessed_data")
+        if not filenames:
+            continue
 
-    # Mirror the raw_data directory structure into preprocessed_data
-    for dirpath, dirnames, filenames in os.walk(raw_data_path, followlinks=True):
-        # Compute the relative path from raw_data and recreate it under preprocessed_data
-        rel_path = os.path.relpath(dirpath, raw_data_path)
-        target_dir = os.path.join(preprocessed_data_path, rel_path)
         os.makedirs(target_dir, exist_ok=True)
-        
+
         for filename in filenames:
-            source_file = os.path.join(dirpath, filename)
             target_file = os.path.join(target_dir, filename)
+            if os.path.exists(target_file):
+                print(f"Skipping (already exists): {target_file}")
+                continue
+
+            source_file = os.path.join(dirpath, filename)
             process_result = preprocess_video(source_file, target_file, model, target_size=224, padding=0.2)
             if process_result == False:
                 raise RuntimeError(f"Failed to preprocess video: {source_file}")
-    
+
         print(f"The videos in the {dirpath} dir have been processed.")
 
 if __name__ == "__main__":

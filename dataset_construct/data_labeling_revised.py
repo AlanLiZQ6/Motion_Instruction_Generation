@@ -19,22 +19,6 @@ dataset_lookup = {entry["beginner_video_name"]: entry for entry in dataset}
 csv_dir = os.path.join(os.path.dirname(__file__), 'label_csv')
 csv_files = sorted([f for f in os.listdir(csv_dir) if f.endswith('.csv')])
 
-# Map motion_type codes to human-readable action names for the prompt
-motion_type_names = {
-    "backhand": "tennis backhand",
-    "backhand2h": "tennis two-handed backhand",
-    "bslice": "tennis backhand slice",
-    "bvolley": "tennis backhand volley",
-    "foreflat": "tennis forehand flat",
-    "foreopen": "tennis forehand open stance",
-    "fslice": "tennis forehand slice",
-    "fvolley": "tennis forehand volley",
-    "serflat": "tennis flat serve",
-    "serkick": "tennis kick serve",
-    "serslice": "tennis slice serve",
-    "smash": "tennis smash",
-}
-
 for csv_file in csv_files:
     print(f"\nProcessing {csv_file}...")
     file_index = pd.read_csv(os.path.join(csv_dir, csv_file))
@@ -47,7 +31,7 @@ for csv_file in csv_files:
         beginner_video = gemini_model.files.upload(file=row["beginner_avi_path"])
         expert_video = gemini_model.files.upload(file=row["inference_avi_path"])
 
-        while beginner_video.state.name == "PROCESSING" or expert_video.state.name == "PROCESSING":
+        while beginner_video.state.name == "PROCESSING" and expert_video.state.name == "PROCESSING":
             print("Waiting for file to be processed...")
             time.sleep(5)
             beginner_video = gemini_model.files.get(name=beginner_video.name)
@@ -55,18 +39,18 @@ for csv_file in csv_files:
             if beginner_video.state.name == "FAILED" or expert_video.state.name == "FAILED":
                 raise ValueError("File processing failed.")
 
-        action_name = motion_type_names.get(row["action"], row["action"])
         response = gemini_model.models.generate_content(
             model="gemini-3.1-flash-lite-preview",
             contents=[
                 beginner_video,
                 expert_video,
-                f"""The first video shows a beginner performing a {action_name}.
-                The second video shows an expert performing the same action.
+                """The first video shows a beginner performing a tennis
+                flat serve. The second video shows an expert performing
+                the same serve.
 
                 As a professional tennis coach, compare the two and
                 generate 2-3 sentences of specific coaching instruction
-                for the beginner."""
+                for the beginner..."""
             ]
         )
 
