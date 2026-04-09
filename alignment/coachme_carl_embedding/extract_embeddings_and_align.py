@@ -113,7 +113,7 @@ def main():
     # --- Config ---
     checkpoint_path = os.path.join(
         VIDEO_ALIGN_DIR,
-        "result/tennis_alignment/checkpoints/checkpoint_epoch_00099.pth"
+        "result/tennis_alignment/checkpoints/checkpoint_epoch_00499.pth"
     )
     params_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "global_params.json")
@@ -122,9 +122,23 @@ def main():
         params = json.load(f)
 
     dataset_path = params["dataset_path"]
-    video_dir = os.path.join(dataset_path, "preprocessed_data", "forehand_flat")
-    beginner_dir = os.path.join(video_dir, "beginner")
-    expert_dir = os.path.join(video_dir, "experts")
+    preprocessed_dir = os.path.join(dataset_path, "preprocessed_data")
+
+    # Map short motion_type names in dataset.json to directory names
+    motion_type_map = {
+        "backhand": "backhand",
+        "backhand2h": "backhand2hands",
+        "bslice": "backhand_slice",
+        "bvolley": "backhand_volley",
+        "foreflat": "forehand_flat",
+        "foreopen": "forehand_openstands",
+        "fslice": "forehand_slice",
+        "fvolley": "forehand_volley",
+        "serflat": "flat_service",
+        "serkick": "kick_service",
+        "serslice": "slice_service",
+        "smash": "smash",
+    }
 
     dataset_json_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "dataset_build", "dataset.json")
@@ -153,11 +167,13 @@ def main():
 
     # --- Run alignment ---
     for i, entry in enumerate(dataset):
-        beg_name = entry["beginner_video_name"].replace("_world.npy", ".avi")
-        exp_name = entry["expert_video_name"].replace("_world.npy", ".avi")
+        motion_type = entry["motion_type"]
+        dir_name = motion_type_map.get(motion_type, motion_type)
+        beg_name = entry["beginner_video_name"].replace(".npy", ".avi")
+        exp_name = entry["expert_video_name"].replace(".npy", ".avi")
 
-        beg_path = os.path.join(beginner_dir, beg_name)
-        exp_path = os.path.join(expert_dir, exp_name)
+        beg_path = os.path.join(preprocessed_dir, dir_name, "beginner", beg_name)
+        exp_path = os.path.join(preprocessed_dir, dir_name, "experts", exp_name)
 
         if not os.path.exists(beg_path):
             print(f"[SKIP] Beginner not found: {beg_name}")

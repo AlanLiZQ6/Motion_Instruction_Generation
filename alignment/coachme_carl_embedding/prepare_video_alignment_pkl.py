@@ -1,20 +1,22 @@
 """
 Prepare train.pkl and test.pkl for VideoAlignment training.
 
-Reads all .avi files from the preprocessed tennis dataset,
+Reads all .avi files from ALL motion types in the preprocessed tennis dataset,
 extracts frame counts, and splits into train/test sets (80/20).
 
 Output directory structure:
     /workspace/dataset/tennis_alignment/
     ├── train.pkl
     ├── test.pkl
-    ├── beginner/ -> symlink to source
-    └── experts/  -> symlink to source
+    ├── <motion_type>/
+    │   ├── beginner/ -> symlink to source
+    │   └── experts/  -> symlink to source
+    └── ...
 
 Each sample in the pkl:
     {
-        "name":        str,           # e.g. "p25_foreflat_s2"
-        "video_file":  str,           # e.g. "beginner/p25_foreflat_s2.avi"
+        "name":        str,           # e.g. "forehand_flat/p25_foreflat_s2"
+        "video_file":  str,           # e.g. "forehand_flat/beginner/p25_foreflat_s2.avi"
         "frame_label": Tensor(seq_len),  # zeros (placeholder)
         "seq_len":     int,           # total frames
     }
@@ -35,8 +37,12 @@ def get_frame_count(video_path):
     return count
 
 
-def build_samples(source_dir):
-    """Scan beginner/ and experts/ under source_dir, return list of sample dicts."""
+def build_samples(source_dir, motion_type):
+    """Scan beginner/ and experts/ under source_dir, return list of sample dicts.
+
+    video_file paths are prefixed with motion_type/ so VideoAlignment
+    can find them under PATH_TO_DATASET/<motion_type>/beginner|experts/.
+    """
     samples = []
     for sub in ["beginner", "experts"]:
         sub_dir = os.path.join(source_dir, sub)
@@ -51,10 +57,10 @@ def build_samples(source_dir):
             if seq_len == 0:
                 print(f"[SKIP] 0 frames: {video_path}")
                 continue
-            name = filename.replace(".avi", "")
+            name = os.path.join(motion_type, filename.replace(".avi", ""))
             sample = {
                 "name": name,
-                "video_file": os.path.join(sub, filename),
+                "video_file": os.path.join(motion_type, sub, filename),
                 "frame_label": torch.zeros(seq_len),
                 "seq_len": seq_len,
             }
@@ -70,34 +76,55 @@ def main():
         params = json.load(f)
 
     dataset_path = params["dataset_path"]
-    source_dir = os.path.join(dataset_path, "preprocessed_data", "forehand_flat")
+    preprocessed_dir = os.path.join(dataset_path, "preprocessed_data")
     output_dir = os.path.join(dataset_path, "tennis_alignment")
     os.makedirs(output_dir, exist_ok=True)
 
-    # Create symlinks so VideoAlignment can find videos via PATH_TO_DATASET
-    for sub in ["beginner", "experts"]:
-        link = os.path.join(output_dir, sub)
-        target = os.path.join(source_dir, sub)
-        if not os.path.exists(link):
-            os.symlink(target, link)
-            print(f"Symlink: {link} -> {target}")
+    # Discover all motion types
+    motion_types = sorted([
+        d for d in os.listdir(preprocessed_dir)
+        if os.path.isdir(os.path.join(preprocessed_dir, d))
+    ])
+    print(f"Found {len(motion_types)} motion types: {motion_types}")
 
-    # Build all samples
-    samples = build_samples(source_dir)
+    # Create symlinks so VideoAlignment can find videos via
+    # PATH_TO_DATASET/<motion_type>/beginner|experts/
+    samples = []
+    for motion_type in motion_types:
+        source_dir = os.path.join(preprocessed_dir, motion_type)
+        mt_output = os.path.join(output_dir, motion_type)
+        os.makedirs(mt_output, exist_ok=True)
+        for sub in ["beginner", "experts"]:
+            link = os.path.join(mt_output, sub)
+            target = os.path.join(source_dir, sub)
+            if not os.path.exists(link):
+                os.symlink(target, link)
+                print(f"Symlink: {link} -> {target}")
+
+        mt_samples = build_samples(source_dir, motion_type)
+        print(f"  {motion_type}: {len(mt_samples)} samples")
+        samples.extend(mt_samples)
+
     print(f"\nTotal samples: {len(samples)}")
 
-    # Split train/test (80/20), stratified by beginner/expert
+    # Split train/test (80/20), stratified by beginner/expert per motion type
     random.seed(42)
-    beginners = [s for s in samples if "beginner" in s["video_file"]]
-    experts = [s for s in samples if "experts" in s["video_file"]]
-    random.shuffle(beginners)
-    random.shuffle(experts)
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for s in samples:
+        # key = (motion_type, role)  e.g. ("forehand_flat", "beginner")
+        parts = s["video_file"].split(os.sep)
+        key = (parts[0], parts[1])
+        groups[key].append(s)
 
-    split_b = int(len(beginners) * 0.8)
-    split_e = int(len(experts) * 0.8)
+    train_set, test_set = [], []
+    for key in sorted(groups.keys()):
+        group = groups[key]
+        random.shuffle(group)
+        split = int(len(group) * 0.8)
+        train_set.extend(group[:split])
+        test_set.extend(group[split:])
 
-    train_set = beginners[:split_b] + experts[:split_e]
-    test_set = beginners[split_b:] + experts[split_e:]
     random.shuffle(train_set)
     random.shuffle(test_set)
 
