@@ -2,11 +2,13 @@
 Build CoachMe-format pickle files from dataset.json + skeleton .npy files.
 
 Produces:
-  - pkl_output/tennis_train.pkl   (training samples, ~80%)
-  - pkl_output/tennis_test.pkl    (test samples, ~20%)
-  - pkl_output/tennis_standard.pkl (expert reference skeleton)
+  - pkl_output_smpl22/tennis_train.pkl   (training samples, ~80%)
+  - pkl_output_smpl22/tennis_test.pkl    (test samples, ~20%)
+  - pkl_output_smpl22/tennis_standard.pkl (one expert reference per motion type)
 
 Each pkl file contains a list of dicts matching CoachMe's expected format.
+Supports all 12 motion types. Train/test split is stratified by
+(motion_type, person) and shuffled to ensure balanced batches.
 """
 
 import numpy as np
@@ -14,6 +16,24 @@ import pickle
 import json
 import os
 import random
+from collections import defaultdict
+
+
+# Map short motion_type names in dataset.json to skeleton directory names
+MOTION_TYPE_TO_DIR = {
+    "backhand": "backhand_skeleton",
+    "backhand2h": "backhand2hands_skeleton",
+    "bslice": "backhand_slice_skeleton",
+    "bvolley": "backhand_volley_skeleton",
+    "foreflat": "forehand_flat_skeleton",
+    "foreopen": "forehand_openstands_skeleton",
+    "fslice": "forehand_slice_skeleton",
+    "fvolley": "forehand_volley_skeleton",
+    "serflat": "flat_service_skeleton",
+    "serkick": "kick_service_skeleton",
+    "serslice": "slice_service_skeleton",
+    "smash": "smash_skeleton",
+}
 
 
 def main():
@@ -27,9 +47,7 @@ def main():
         params = json.load(f)
 
     dataset_path = params["dataset_path"]
-    skeleton_dir = os.path.join(dataset_path, "skeleton_output_smpl22", "forehand_flat_skeleton")
-    beginner_dir = os.path.join(skeleton_dir, "beginner")
-    expert_dir = os.path.join(skeleton_dir, "experts")
+    smpl22_dir = os.path.join(dataset_path, "skeleton_output_smpl22")
     output_dir = os.path.join(dataset_path, "pkl_output_smpl22")
     os.makedirs(output_dir, exist_ok=True)
 
@@ -41,42 +59,58 @@ def main():
         dataset = json.load(f)
 
     # ---------------------------------------------------------------
-    # 1. Build standard (expert) pickle
+    # 1. Build standard (expert) pickle — one expert per motion type
     # ---------------------------------------------------------------
-    # All entries use the same expert: p46_foreflat_s1_world.npy
-    expert_name = dataset[0]["expert_video_name"]
-    expert_skel = np.load(os.path.join(expert_dir, expert_name))  # (T, 33, 3)
+    # Collect unique expert per motion type
+    expert_map = {}
+    for entry in dataset:
+        mt = entry["motion_type"]
+        if mt not in expert_map:
+            expert_map[mt] = entry["expert_video_name"]
 
-    standard_list = [{
-        "video_name": "foreflat",
-        "motion_type": "foreflat",
-        "coordinates": expert_skel,
-    }]
+    standard_list = []
+    expert_skeletons = {}  # mt -> skeleton array, for alignment clamping
+    for mt, expert_name in sorted(expert_map.items()):
+        skel_dir = os.path.join(smpl22_dir, MOTION_TYPE_TO_DIR[mt], "experts")
+        expert_path = os.path.join(skel_dir, expert_name)
+        if not os.path.exists(expert_path):
+            print(f"[WARN] Expert not found: {expert_path}")
+            continue
+        expert_skel = np.load(expert_path)  # (T, 22, 3)
+        expert_skeletons[mt] = expert_skel
+        standard_list.append({
+            "video_name": mt,
+            "motion_type": mt,
+            "coordinates": expert_skel,
+        })
+        print(f"Expert [{mt}]: {expert_name}  shape={expert_skel.shape}")
 
     standard_path = os.path.join(output_dir, "tennis_standard.pkl")
     with open(standard_path, "wb") as f:
         pickle.dump(standard_list, f)
-    print(f"Saved standard: {standard_path}  (expert: {expert_name}, shape: {expert_skel.shape})")
+    print(f"\nSaved standard: {standard_path}  ({len(standard_list)} experts)")
 
     # ---------------------------------------------------------------
-    # 2. Build beginner sample list
+    # 2. Build beginner sample list — all motion types
     # ---------------------------------------------------------------
     samples = []
+    skip_count = 0
     for entry in dataset:
+        mt = entry["motion_type"]
+        dir_name = MOTION_TYPE_TO_DIR[mt]
         beg_name = entry["beginner_video_name"]
-        beg_path = os.path.join(beginner_dir, beg_name)
+        beg_path = os.path.join(smpl22_dir, dir_name, "beginner", beg_name)
 
         if not os.path.exists(beg_path):
-            print(f"[SKIP] Not found: {beg_name}")
+            print(f"[SKIP] Not found: {beg_path}")
+            skip_count += 1
             continue
 
-        beg_skel = np.load(beg_path)  # (T, 33, 3)
-
-        # Video name without extension (matches CoachMe convention)
-        video_name = beg_name.replace("_world.npy", "")
+        beg_skel = np.load(beg_path)  # (T, 22, 3)
+        video_name = beg_name.replace(".npy", "")
 
         beg_len = beg_skel.shape[0]
-        std_len = expert_skel.shape[0]
+        std_len = expert_skeletons[mt].shape[0] if mt in expert_skeletons else beg_len
 
         # Use alignment results from dataset.json (computed by DTW)
         aligned_start = entry.get("aligned_start_frame", 0)
@@ -90,7 +124,7 @@ def main():
 
         sample = {
             "video_name": video_name,
-            "motion_type": entry["motion_type"],
+            "motion_type": mt,
             "coordinates": beg_skel,
             "labels": entry["labels"],
             "augmented_labels": None,
@@ -103,32 +137,45 @@ def main():
         }
         samples.append(sample)
 
-    print(f"\nTotal samples: {len(samples)}")
+    print(f"\nTotal samples: {len(samples)}  (skipped: {skip_count})")
 
     # ---------------------------------------------------------------
-    # 3. Train/test split (80/20, grouped by person)
+    # 3. Train/test split (80/20, stratified by motion_type + person)
     # ---------------------------------------------------------------
-    # Group by person ID to avoid data leakage
-    person_samples = {}
+    # Group by (motion_type, person_id) to ensure balanced split
+    groups = defaultdict(list)
     for s in samples:
-        # Extract person ID: p10_foreflat_s1 -> p10
         person_id = s["video_name"].split("_")[0]
-        if person_id not in person_samples:
-            person_samples[person_id] = []
-        person_samples[person_id].append(s)
+        groups[(s["motion_type"], person_id)].append(s)
 
-    person_ids = sorted(person_samples.keys())
-    random.shuffle(person_ids)
+    train_samples, test_samples = [], []
+    for key in sorted(groups.keys()):
+        group = groups[key]
+        random.shuffle(group)
+        split = int(len(group) * 0.8)
+        if split == 0 and len(group) > 0:
+            split = 1  # ensure at least 1 sample in train
+        train_samples.extend(group[:split])
+        test_samples.extend(group[split:])
 
-    split_idx = int(len(person_ids) * 0.8)
-    train_persons = set(person_ids[:split_idx])
-    test_persons = set(person_ids[split_idx:])
+    # Shuffle to mix motion types across batches
+    random.shuffle(train_samples)
+    random.shuffle(test_samples)
 
-    train_samples = [s for pid in train_persons for s in person_samples[pid]]
-    test_samples = [s for pid in test_persons for s in person_samples[pid]]
+    # Print distribution
+    train_dist = defaultdict(int)
+    test_dist = defaultdict(int)
+    for s in train_samples:
+        train_dist[s["motion_type"]] += 1
+    for s in test_samples:
+        test_dist[s["motion_type"]] += 1
 
-    print(f"Train: {len(train_samples)} samples ({len(train_persons)} persons: {sorted(train_persons)})")
-    print(f"Test:  {len(test_samples)} samples ({len(test_persons)} persons: {sorted(test_persons)})")
+    print(f"\nTrain: {len(train_samples)} samples")
+    print(f"Test:  {len(test_samples)} samples")
+    print(f"\nPer motion type:")
+    print(f"  {'motion_type':<15} {'train':>6} {'test':>6}")
+    for mt in sorted(set(list(train_dist.keys()) + list(test_dist.keys()))):
+        print(f"  {mt:<15} {train_dist[mt]:>6} {test_dist[mt]:>6}")
 
     # ---------------------------------------------------------------
     # 4. Save train/test pickles
