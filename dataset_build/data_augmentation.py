@@ -13,7 +13,7 @@ import time
 import re
 
 # Set the API key
-gemini_model = genai.Client(api_key="AIzaSyDDKO-w2_vn9twNBEDhjE76YK5__u0207Y")
+gemini_model = genai.Client(api_key="")
 
 # Load dataset.json
 dataset_path = os.path.join(os.path.dirname(__file__), 'dataset.json')

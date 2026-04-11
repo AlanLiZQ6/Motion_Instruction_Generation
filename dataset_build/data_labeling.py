@@ -8,7 +8,7 @@ import re
 import argparse
 
 # Set the API key
-gemini_model = genai.Client(api_key="AIzaSyBfle5RYj1kHzFJdY0lPoDqv9rANWU3xTc")
+gemini_model = genai.Client(api_key="")
 
 # Load dataset.json
 dataset_path = os.path.join(os.path.dirname(__file__), 'dataset.json')
