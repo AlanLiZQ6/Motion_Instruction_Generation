@@ -127,7 +127,7 @@ def main():
             "motion_type": mt,
             "coordinates": beg_skel,
             "labels": entry["labels"],
-            "augmented_labels": None,
+            "augmented_labels": entry.get("augmented_labels", None),
             "original_seq_len": beg_len,
             "aligned_start_frame": aligned_start,
             "aligned_end_frame": aligned_end,
