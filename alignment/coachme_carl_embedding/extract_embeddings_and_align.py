@@ -18,7 +18,7 @@ import pickle
 from scipy.spatial.distance import cdist
 
 # Add VideoAlignment to path for model imports
-VIDEO_ALIGN_DIR = "/workspace/MotionExpert_forked/VideoAlignment"
+VIDEO_ALIGN_DIR = "/workspace/VideoAlignment_forked"
 sys.path.insert(0, VIDEO_ALIGN_DIR)
 
 
@@ -41,9 +41,12 @@ def read_video_cv2(video_path):
 
 
 def load_model(checkpoint_path, cfg):
-    """Load trained CARL model from checkpoint."""
-    from model.transformer.transformer import CARL
-    model = CARL(cfg)
+    """Load trained CARL model from checkpoint.
+
+    We trained with --carl, which builds carl_transformer.transformer.TransformerModel.
+    """
+    from model.carl_transformer.transformer import TransformerModel
+    model = TransformerModel(cfg, test=False)
     ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     # Remove "module." prefix from DDP state dict
     state_dict = {}
@@ -113,7 +116,7 @@ def main():
     # --- Config ---
     checkpoint_path = os.path.join(
         VIDEO_ALIGN_DIR,
-        "result/tennis_alignment/checkpoints/checkpoint_epoch_00499.pth"
+        "result/tennis_carl/checkpoints/checkpoint_epoch_00299.pth"
     )
     params_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "global_params.json")
