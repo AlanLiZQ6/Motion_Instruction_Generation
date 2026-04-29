@@ -3,59 +3,43 @@ import os
 import json
 
 
-def mediapipe_to_smpl22(mp):
-    """
-    Convert MediaPipe 33-joint skeleton to SMPL 22-joint format.
+def mediapipe_to_smpl_v22(media_pipe_v):
 
-    Args:
-        mp: (T, 33, 3) MediaPipe landmarks
+    T = media_pipe_v.shape[0]
+    smpl_v = np.zeros((T, 22, 3), dtype=media_pipe_v.dtype)
 
-    Returns:
-        smpl: (T, 22, 3) SMPL joints
-    """
-    T = mp.shape[0]
-    smpl = np.zeros((T, 22, 3), dtype=mp.dtype)
+    smpl_v[:, 1]  = media_pipe_v[:, 23]   # left_hip
+    smpl_v[:, 2]  = media_pipe_v[:, 24]   # right_hip
+    smpl_v[:, 4]  = media_pipe_v[:, 25]   # left_knee
+    smpl_v[:, 5]  = media_pipe_v[:, 26]   # right_knee
+    smpl_v[:, 7]  = media_pipe_v[:, 27]   # left_ankle
+    smpl_v[:, 8]  = media_pipe_v[:, 28]   # right_ankle
+    smpl_v[:, 10] = media_pipe_v[:, 31]   # left_foot
+    smpl_v[:, 11] = media_pipe_v[:, 32]   # right_foot
+    smpl_v[:, 15] = media_pipe_v[:, 0]    # head (nose)
+    smpl_v[:, 16] = media_pipe_v[:, 11]   # left_shoulder
+    smpl_v[:, 17] = media_pipe_v[:, 12]   # right_shoulder
+    smpl_v[:, 18] = media_pipe_v[:, 13]   # left_elbow
+    smpl_v[:, 19] = media_pipe_v[:, 14]   # right_elbow
+    smpl_v[:, 20] = media_pipe_v[:, 15]   # left_wrist
+    smpl_v[:, 21] = media_pipe_v[:, 16]   # right_wrist
 
-    # --- Direct mappings ---
-    smpl[:, 1]  = mp[:, 23]   # left_hip
-    smpl[:, 2]  = mp[:, 24]   # right_hip
-    smpl[:, 4]  = mp[:, 25]   # left_knee
-    smpl[:, 5]  = mp[:, 26]   # right_knee
-    smpl[:, 7]  = mp[:, 27]   # left_ankle
-    smpl[:, 8]  = mp[:, 28]   # right_ankle
-    smpl[:, 10] = mp[:, 31]   # left_foot
-    smpl[:, 11] = mp[:, 32]   # right_foot
-    smpl[:, 15] = mp[:, 0]    # head (nose)
-    smpl[:, 16] = mp[:, 11]   # left_shoulder
-    smpl[:, 17] = mp[:, 12]   # right_shoulder
-    smpl[:, 18] = mp[:, 13]   # left_elbow
-    smpl[:, 19] = mp[:, 14]   # right_elbow
-    smpl[:, 20] = mp[:, 15]   # left_wrist
-    smpl[:, 21] = mp[:, 16]   # right_wrist
+    # Pelvis is the midpoint of hips
+    smpl_v[:, 0] = (media_pipe_v[:, 23] + media_pipe_v[:, 24]) / 2.0
+    # Neck is the midpoint of shoulders
+    smpl_v[:, 12] = (media_pipe_v[:, 11] + media_pipe_v[:, 12]) / 2.0
+    # Left collar is the midpoint of neck and left shoulder
+    smpl_v[:, 13] = (smpl_v[:, 12] + media_pipe_v[:, 11]) / 2.0
+    # Right collar is the midpoint of neck and right shoulder
+    smpl_v[:, 14] = (smpl_v[:, 12] + media_pipe_v[:, 12]) / 2.0
+    # spine should be equal to neck
+    smpl_v[:, 9] = (media_pipe_v[:, 11] + media_pipe_v[:, 12]) / 2.0
+    # spine1 can be set to 1/3 from pelvis to neck)
+    smpl_v[:, 3] = smpl_v[:, 0] + (smpl_v[:, 12] - smpl_v[:, 0]) * (1.0 / 3.0)
+    # spine2 can be set to 2/3 from pelvis ot neck
+    smpl_v[:, 6] = smpl_v[:, 0] + (smpl_v[:, 12] - smpl_v[:, 0]) * (2.0 / 3.0)
 
-    # --- Computed joints ---
-    # Pelvis = midpoint of hips
-    smpl[:, 0] = (mp[:, 23] + mp[:, 24]) / 2.0
-
-    # Neck = midpoint of shoulders
-    neck = (mp[:, 11] + mp[:, 12]) / 2.0
-    smpl[:, 12] = neck
-
-    # Spine chain: interpolate between pelvis and neck
-    pelvis = smpl[:, 0]
-    # spine  (1/3 from pelvis to neck)
-    smpl[:, 3] = pelvis + (neck - pelvis) * (1.0 / 3.0)
-    # spine1 (2/3 from pelvis to neck)
-    smpl[:, 6] = pelvis + (neck - pelvis) * (2.0 / 3.0)
-    # spine2 = neck (same as neck, as spine2 connects to neck/collars)
-    smpl[:, 9] = neck
-
-    # Left collar  = midpoint of neck and left shoulder
-    smpl[:, 13] = (neck + mp[:, 11]) / 2.0
-    # Right collar = midpoint of neck and right shoulder
-    smpl[:, 14] = (neck + mp[:, 12]) / 2.0
-
-    return smpl
+    return smpl_v
 
 
 def convert_directory(source_dir, target_dir):
@@ -73,12 +57,12 @@ def convert_directory(source_dir, target_dir):
             src_path = os.path.join(dirpath, filename)
             dst_path = os.path.join(out_dir, filename)
 
-            mp_data = np.load(src_path)  # (T, 33, 3)
-            smpl_data = mediapipe_to_smpl22(mp_data)  # (T, 22, 3)
+            mp_data = np.load(src_path)  
+            smpl_v_data = mediapipe_to_smpl_v22(mp_data)
 
-            np.save(dst_path, smpl_data)
+            np.save(dst_path, smpl_v_data)
             count += 1
-            print(f"[{count}] {src_path} ({mp_data.shape}) -> {dst_path} ({smpl_data.shape})")
+            print(f"[{count}] {src_path} ({mp_data.shape}) -> {dst_path} ({smpl_v_data.shape})")
 
     return count
 
@@ -92,10 +76,10 @@ def main():
 
     dataset_path = params["dataset_path"]
     source_dir = os.path.join(dataset_path, "skeleton_output")
-    target_dir = os.path.join(dataset_path, "skeleton_output_smpl22")
+    target_dir = os.path.join(dataset_path, "skeleton_output_smpl_v22")
 
     print(f"Source: {source_dir}  (MediaPipe 33 joints)")
-    print(f"Target: {target_dir}  (SMPL 22 joints)\n")
+    print(f"Target: {target_dir}  (smpl_v 22 joints)\n")
 
     total = convert_directory(source_dir, target_dir)
     print(f"\nDone. Converted {total} files from 33 -> 22 joints.")

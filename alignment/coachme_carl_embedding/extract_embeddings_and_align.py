@@ -1,12 +1,8 @@
-"""
-Extract frame-level embeddings from trained VideoAlignment model,
-then run DTW alignment using learned embeddings instead of raw skeleton.
-
-Usage (run from /workspace/MotionExpert/VideoAlignment):
-    python /workspace/Motion_Instruction_Generation/alignment/extract_embeddings_and_align.py
-
-Or from anywhere with the main conda env active.
-"""
+# Citations:
+# https://github.com/pierre-rouanet/dtw
+# https://github.com/MotionXperts/MotionExpert
+# https://github.com/MotionXperts/VideoAlignment
+# https://github.com/minghchen/CARL_code
 
 import os
 import sys
@@ -15,11 +11,14 @@ import numpy as np
 import cv2
 import torch
 import pickle
-from scipy.spatial.distance import cdist
+
 
 # Add VideoAlignment to path for model imports
 VIDEO_ALIGN_DIR = "/workspace/VideoAlignment_forked"
 sys.path.insert(0, VIDEO_ALIGN_DIR)
+
+from utils.dtw import dtw as official_dtw
+from model.carl_transformer.transformer import TransformerModel
 
 
 def read_video_cv2(video_path):
@@ -41,14 +40,9 @@ def read_video_cv2(video_path):
 
 
 def load_model(checkpoint_path, cfg):
-    """Load trained CARL model from checkpoint.
 
-    We trained with --carl, which builds carl_transformer.transformer.TransformerModel.
-    """
-    from model.carl_transformer.transformer import TransformerModel
     model = TransformerModel(cfg, test=False)
     ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-    # Remove "module." prefix from DDP state dict
     state_dict = {}
     for k, v in ckpt["model_state"].items():
         new_k = k.replace("module.", "") if k.startswith("module.") else k
@@ -59,61 +53,32 @@ def load_model(checkpoint_path, cfg):
 
 
 def extract_embedding(model, video_path, device):
-    """Extract per-frame embeddings (T, 128) for a single video."""
-    video = read_video_cv2(video_path)  # (T, C, H, W)
 
-    # Normalize like the training pipeline
+    video = read_video_cv2(video_path)
+
+    # The data is from the Coachme video alignment
     mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
     std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
     video = (video - mean) / std
 
-    video = video.unsqueeze(0).to(device)  # (1, T, C, H, W)
+    video = video.unsqueeze(0).to(device) 
 
     with torch.no_grad(), torch.cuda.amp.autocast():
         embs = model(video, video_masks=None, skeleton=None, split="eval")
 
-    return embs[0].cpu().numpy()  # (T, 128)
+    return embs[0].cpu().numpy() 
 
 
 def dtw_on_embeddings(query_embs, ref_embs):
-    """
-    Standard DTW on learned embeddings.
 
-    Args:
-        query_embs:  (T1, 128) beginner embeddings
-        ref_embs:    (T2, 128) expert embeddings
-
-    Returns:
-        path, cost, normalized_cost
-    """
-    D = cdist(query_embs, ref_embs, metric="sqeuclidean")
-    N, M = D.shape
-
-    C = np.full((N + 1, M + 1), np.inf)
-    C[0, 0] = 0
-    for i in range(1, N + 1):
-        for j in range(1, M + 1):
-            C[i, j] = D[i - 1, j - 1] + min(C[i - 1, j], C[i, j - 1], C[i - 1, j - 1])
-
-    # Backtrack
-    path = []
-    i, j = N, M
-    while i > 0 and j > 0:
-        path.append((i - 1, j - 1))
-        candidates = [
-            (C[i - 1, j - 1], i - 1, j - 1),
-            (C[i - 1, j],     i - 1, j),
-            (C[i, j - 1],     i,     j - 1),
-        ]
-        _, i, j = min(candidates, key=lambda x: x[0])
-    path.reverse()
-
-    cost = float(C[N, M])
-    return path, cost, cost / len(path)
+    cost, _, _, path = official_dtw(query_embs, ref_embs, dist="sqeuclidean")
+    p, q = path
+    pairs = list(zip(p.tolist(), q.tolist()))
+    return pairs, float(cost), float(cost) / len(pairs)
 
 
 def main():
-    # --- Config ---
+
     checkpoint_path = os.path.join(
         VIDEO_ALIGN_DIR,
         "result/tennis_carl/checkpoints/checkpoint_epoch_00299.pth"

@@ -1,33 +1,10 @@
-"""
-Prepare train.pkl and test.pkl for VideoAlignment training.
-
-Reads all .avi files from ALL motion types in the preprocessed tennis dataset,
-extracts frame counts, and splits into train/test sets (80/20).
-
-Output directory structure:
-    /workspace/dataset/tennis_alignment/
-    ├── train.pkl
-    ├── test.pkl
-    ├── <motion_type>/
-    │   ├── beginner/ -> symlink to source
-    │   └── experts/  -> symlink to source
-    └── ...
-
-Each sample in the pkl:
-    {
-        "name":        str,           # e.g. "forehand_flat/p25_foreflat_s2"
-        "video_file":  str,           # e.g. "forehand_flat/beginner/p25_foreflat_s2.avi"
-        "frame_label": Tensor(seq_len),  # zeros (placeholder)
-        "seq_len":     int,           # total frames
-    }
-"""
-
 import cv2
 import os
 import pickle
 import random
 import json
 import torch
+from collections import defaultdict
 
 
 def get_frame_count(video_path):
@@ -38,11 +15,8 @@ def get_frame_count(video_path):
 
 
 def build_samples(source_dir, motion_type):
-    """Scan beginner/ and experts/ under source_dir, return list of sample dicts.
-
-    video_file paths are prefixed with motion_type/ so VideoAlignment
-    can find them under PATH_TO_DATASET/<motion_type>/beginner|experts/.
-    """
+    
+    
     samples = []
     for sub in ["beginner", "experts"]:
         sub_dir = os.path.join(source_dir, sub)
@@ -85,7 +59,6 @@ def main():
         d for d in os.listdir(preprocessed_dir)
         if os.path.isdir(os.path.join(preprocessed_dir, d))
     ])
-    print(f"Found {len(motion_types)} motion types: {motion_types}")
 
     # Create symlinks so VideoAlignment can find videos via
     # PATH_TO_DATASET/<motion_type>/beginner|experts/
@@ -107,12 +80,8 @@ def main():
 
     print(f"\nTotal samples: {len(samples)}")
 
-    # Split train/test (80/20), stratified by beginner/expert per motion type
-    random.seed(42)
-    from collections import defaultdict
     groups = defaultdict(list)
     for s in samples:
-        # key = (motion_type, role)  e.g. ("forehand_flat", "beginner")
         parts = s["video_file"].split(os.sep)
         key = (parts[0], parts[1])
         groups[key].append(s)
@@ -137,23 +106,8 @@ def main():
     with open(test_pkl, "wb") as f:
         pickle.dump(test_set, f)
 
-    print(f"\nTrain: {len(train_set)} samples -> {train_pkl}")
-    print(f"Test:  {len(test_set)} samples -> {test_pkl}")
-
-    # Print a few examples
-    print("\n--- Train sample example ---")
-    s = train_set[0]
-    print(f"  name: {s['name']}")
-    print(f"  video_file: {s['video_file']}")
-    print(f"  seq_len: {s['seq_len']}")
-    print(f"  frame_label shape: {s['frame_label'].shape}")
-
-    print("\n--- Test sample example ---")
-    s = test_set[0]
-    print(f"  name: {s['name']}")
-    print(f"  video_file: {s['video_file']}")
-    print(f"  seq_len: {s['seq_len']}")
-    print(f"  frame_label shape: {s['frame_label'].shape}")
+    print(f"\nTrain dataset in pkl has been finished.")
+    print(f"Test dataset in pkl has been finished.")
 
 
 if __name__ == "__main__":

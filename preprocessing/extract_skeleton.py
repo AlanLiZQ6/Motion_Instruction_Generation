@@ -48,7 +48,7 @@ def extract_skeleton(video_path, model_path, output_path):
 
     cap.release()
 
-    skeleton = np.array(all_frames)  # shape: (num_frames, 33, 3)
+    skeleton = np.array(all_frames) 
     np.save(output_path, skeleton)
     print(f"Saved: {output_path}  shape: {skeleton.shape}")
 
@@ -77,14 +77,12 @@ def main():
             print(f"Skipping {action_dir}: {skeleton_dir_name} already exists")
             continue
 
-        # Walk through subdirectories (e.g., beginner/, experts/)
         for root, _, files in os.walk(action_input):
             for filename in sorted(files):
                 if not filename.endswith(".avi"):
                     continue
 
                 video_file = os.path.join(root, filename)
-                # Preserve subdirectory structure (e.g., beginner/)
                 rel_path = os.path.relpath(root, action_input)
                 npy_dir = os.path.join(action_output, rel_path)
                 os.makedirs(npy_dir, exist_ok=True)
