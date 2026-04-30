@@ -1,3 +1,7 @@
+# This file will use the Gemini API to generate the label for each pair of the video.
+# Citations:
+# Gemini API: https://ai.google.dev/gemini-api/docs
+
 from google import genai
 import json
 import os
