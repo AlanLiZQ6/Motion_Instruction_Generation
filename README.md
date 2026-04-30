@@ -120,4 +120,9 @@ torchrun --nproc_per_node=1 --master_port=29500 evaluation.py --cfg_file results
 torchrun --nproc_per_node=1 --master_port=29500 evaluation.py --cfg_file results/tennis_v4/tennis_v4.yaml
 
 
+# Dataset Reproduce
+### Since Dataset preprocessing requires the execution of many processes, it consists of multiple procedures such as video inversion, skeletion extraction, labeling and video alignment.
+
+
+
 
